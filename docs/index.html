@@ -9,8 +9,41 @@
 </head>
 <body>
   <h1>Hello PWA</h1>
+
+  <form id="form">
+    <input id="code" placeholder="Stock code, e.g. 2330" inputmode="numeric" value="2330">
+    <button>Search</button>
+  </form>
+  <p><span id="name"></span> <span id="price"></span></p>
+
   <script>
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js');
+
+    let code = "2330";
+
+    async function update() {
+      try {
+        const r = await fetch(`https://twse-proxy.william910122.workers.dev/?code=${code}`);
+        const s = (await r.json()).msgArray[0];
+        if (!s?.n) throw new Error();
+        // z = last trade price, "-" when there's no recent trade; fall back to y = previous close
+        const price = s.z !== "-" ? s.z : s.y;
+        document.getElementById("name").textContent = s.n;
+        document.getElementById("price").textContent = Number(price).toFixed(2);
+      } catch {
+        document.getElementById("name").textContent = "";
+        document.getElementById("price").textContent = "Not found";
+      }
+    }
+
+    document.getElementById("form").addEventListener("submit", e => {
+      e.preventDefault();
+      code = document.getElementById("code").value.trim();
+      update();
+    });
+
+    update();
+    setInterval(update, 5000);
   </script>
 </body>
 </html>
