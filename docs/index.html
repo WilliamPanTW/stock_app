@@ -21,9 +21,9 @@
   <script>
     if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js');
 
-    let code = "2330";
-
-    async function update() {
+    async function search(e) {
+      e.preventDefault();
+      const code = document.getElementById("code").value.trim();
       try {
         const r = await fetch(`https://twse-proxy.william910122.workers.dev/?code=${code}`);
         const s = (await r.json()).msgArray[0];
@@ -38,11 +38,7 @@
       }
     }
 
-    document.getElementById("form").addEventListener("submit", e => {
-      e.preventDefault();
-      code = document.getElementById("code").value.trim();
-      update();
-    });
+    document.getElementById("form").addEventListener("submit", search);
 
     // Permission must be requested from a user tap (required on iOS)
     const notifyBtn = document.getElementById("notify");
@@ -53,9 +49,6 @@
       const reg = await navigator.serviceWorker.ready;
       reg.showNotification("My PWA", { body: "Thank you for subscribing!", icon: "assets/icon.png" });
     });
-
-    update();
-    // setInterval(update, 5000);
   </script>
 </body>
 </html>
