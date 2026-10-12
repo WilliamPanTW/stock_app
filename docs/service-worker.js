@@ -11,3 +11,9 @@ self.addEventListener('activate', e =>
 self.addEventListener('fetch', e =>
   e.respondWith(fetch(e.request).catch(() => caches.match(e.request)))
 );
+// Tapping a notification opens/focuses the app
+self.addEventListener('notificationclick', e => {
+  e.notification.close();
+  e.waitUntil(clients.matchAll({ type: 'window' })
+    .then(list => list.length ? list[0].focus() : clients.openWindow('./')));
+});
